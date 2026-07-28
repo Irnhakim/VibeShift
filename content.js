@@ -156,6 +156,23 @@ function hookMediaElement(element) {
 
     hookedElements.set(element, graph);
     applyStateToGraph(graph, audioState);
+
+    // Prevent YouTube/websites from resetting the playback speed dynamically
+    element.addEventListener('ratechange', () => {
+      if (audioState.enabled && element.playbackRate !== audioState.speed) {
+        element.playbackRate = audioState.speed;
+      }
+    });
+
+    // Re-apply full audio graph state when a new video/song starts loading or playing
+    const reapply = () => {
+      const currentGraph = hookedElements.get(element);
+      if (currentGraph) {
+        applyStateToGraph(currentGraph, audioState);
+      }
+    };
+    element.addEventListener('loadstart', reapply);
+    element.addEventListener('play', reapply);
   } catch (err) {
     if (err.name === 'InvalidStateError') {
       console.error(
