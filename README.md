@@ -2,8 +2,6 @@
 
 **VibeShift** is a playful, high-performance Chrome/Brave extension that allows you to transform the music you are playing on YouTube, Spotify Web, SoundCloud, and other platforms in real-time. Boost the bass, turn it into Nightcore, slow it down with reverb, or immerse yourself in 8D spatial audio!
 
-Inspired by the colorful **Saweria** neo-brutalist aesthetic, VibeShift offers a tactile, paper-textured retro interface with full support for both **Light Mode** and **Dark Mode**.
-
 ---
 
 ## 🚀 Key Features
