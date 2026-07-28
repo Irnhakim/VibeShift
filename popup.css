@@ -80,7 +80,20 @@ body {
   padding-bottom: 12px;
 }
 
-.logo {
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+  filter: drop-shadow(2px 2px 0px var(--shadow-color));
+}
+
+.logo-text {
   font-family: var(--font-title);
   font-size: 1.5rem;
   font-weight: 800;

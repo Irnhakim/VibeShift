@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <style>
+    .outline { stroke: #1a1a1a; stroke-width: 20; stroke-linejoin: round; stroke-linecap: round; }
+    .moon { fill: #ffe066; }
+    .star { fill: #ffd43b; }
+    .cloud-front { fill: #f8f9fa; }
+    .cloud-back { fill: #e9ecef; }
+  </style>
+
+  <!-- Moon (Main Center Left) -->
+  <path class="moon outline" d="M 170,110 A 170,170 0 1,0 350,370 A 145,145 0 1,1 170,110 Z" />
+
+  <!-- Star 1 (Top Center) -->
+  <path class="star outline" d="M 300,40 L 312,70 L 345,70 L 320,90 L 332,120 L 300,100 L 268,120 L 280,90 L 255,70 L 288,70 Z" />
+
+  <!-- Cloud 2 (Back Right) -->
+  <path class="cloud-back outline" d="M 330,170 C 320,130 400,110 430,140 C 430,130 470,135 470,165 C 470,195 440,205 420,205 L 330,205 Z" />
+
+  <!-- Cloud 1 (Front Left Bottom) -->
+  <path class="cloud-front outline" d="M 70,360 C 65,300 200,290 220,350 C 220,320 280,320 280,380 C 280,440 210,450 190,450 L 70,450 C 40,450 20,420 20,395 C 20,370 50,360 70,360 Z" />
+
+  <!-- Star 2 (Bottom Right) -->
+  <path class="star outline" d="M 430,390 L 440,415 L 468,415 L 446,432 L 456,458 L 430,440 L 404,458 L 414,432 L 392,415 L 420,415 Z" />
+</svg>
