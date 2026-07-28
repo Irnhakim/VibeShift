@@ -4,6 +4,14 @@
 
 ---
 
+## 🖼️ Screenshots
+
+| Light Mode | Dark Mode |
+|:---:|:---:|
+| ![VibeShift Light Mode](screenshots/light.png) | ![VibeShift Dark Mode](screenshots/dark.png) |
+
+---
+
 ## 🚀 Key Features
 
 *   **⚡ Nightcore Preset**: Instantly speeds up the playback and increases the pitch of any song for that classic energetic Nightcore sound.
@@ -37,13 +45,37 @@ Chromium browsers restrict extension access to audio elements due to strict Cros
 
 ---
 
+## 📁 Project Structure
+
+```
+VibeShift/
+├── icons/                  # Extension icons
+│   ├── icon.svg
+│   ├── icon16.png
+│   ├── icon32.png
+│   ├── icon48.png
+│   └── icon128.png
+├── screenshots/            # UI screenshots for documentation
+│   ├── light.png
+│   └── dark.png
+├── manifest.json           # Chrome Extension manifest (MV3)
+├── popup.html              # Extension popup UI
+├── popup.css               # Popup styles
+├── popup.js                # Popup logic & preset controls
+├── content.js              # Web Audio API processor (MAIN world)
+├── bridge.js               # Storage bridge (isolated world)
+└── LICENSE
+```
+
+---
+
 ## 📦 Installation
 
 To run this extension locally in developer mode:
 
 1.  Clone this repository or download the source code files.
 2.  Open your Google Chrome (or Brave/Edge) browser.
-3.  Navigate to the extensions settings page at `chrome://extensions/`.
+3.  Navigate to the extensions settings page at `chrome://extensions/`
 4.  Toggle **Developer Mode** on in the top-right corner.
 5.  Click **Load Unpacked** in the top-left corner.
 6.  Select the project directory (containing `manifest.json`).
