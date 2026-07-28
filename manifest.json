@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "VibeShift",
+  "version": "1.0",
+  "description": "Real-time audio effects for YouTube, Spotify, and more. Speed, Reverb, Bass Boost, and Pitch control.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["bridge.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    }
+  ]
+}

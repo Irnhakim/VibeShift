@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeShift - Audio Customizer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="logo">VibeShift</h1>
+      <div class="header-actions">
+        <button id="power-btn" class="icon-btn active" title="Toggle Extension ON/OFF">
+          <span style="font-size: 1.1rem; font-weight: bold;">⏻</span>
+        </button>
+        <button id="theme-btn" class="icon-btn" title="Toggle Mode">
+          <span class="moon-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sliders Container (Vertical) -->
+    <div class="sliders-section">
+      <!-- Speed Slider -->
+      <div class="slider-wrapper">
+        <div class="slider-track-container">
+          <input type="range" id="speed" min="0.5" max="2.0" step="0.05" value="1.0" class="vertical-slider">
+          <div class="slider-fill" id="speed-fill"></div>
+        </div>
+        <div class="slider-label">Speed</div>
+        <div class="slider-value" id="speed-val">0%</div>
+      </div>
+
+      <!-- Reverb Slider -->
+      <div class="slider-wrapper">
+        <div class="slider-track-container">
+          <input type="range" id="reverb" min="0" max="100" step="1" value="0" class="vertical-slider">
+          <div class="slider-fill" id="reverb-fill"></div>
+        </div>
+        <div class="slider-label">Reverb</div>
+        <div class="slider-value" id="reverb-val">0%</div>
+      </div>
+
+      <!-- Bass Slider -->
+      <div class="slider-wrapper">
+        <div class="slider-track-container">
+          <input type="range" id="bass" min="-10" max="15" step="1" value="0" class="vertical-slider">
+          <div class="slider-fill" id="bass-fill"></div>
+        </div>
+        <div class="slider-label">Bass</div>
+        <div class="slider-value" id="bass-val">0 dB</div>
+      </div>
+
+      <!-- Mid Slider (EQ) -->
+      <div class="slider-wrapper">
+        <div class="slider-track-container">
+          <input type="range" id="mid" min="-10" max="15" step="1" value="0" class="vertical-slider">
+          <div class="slider-fill" id="mid-fill"></div>
+        </div>
+        <div class="slider-label">Mid</div>
+        <div class="slider-value" id="mid-val">0 dB</div>
+      </div>
+
+      <!-- Treble Slider (EQ) -->
+      <div class="slider-wrapper">
+        <div class="slider-track-container">
+          <input type="range" id="treble" min="-10" max="15" step="1" value="0" class="vertical-slider">
+          <div class="slider-fill" id="treble-fill"></div>
+        </div>
+        <div class="slider-label">Treble</div>
+        <div class="slider-value" id="treble-val">0 dB</div>
+      </div>
+    </div>
+
+    <!-- Toggles Grid Section -->
+    <div class="toggles-grid">
+      <!-- Pitch Toggle -->
+      <div class="toggle-row">
+        <span class="toggle-label">Keep Original Pitch</span>
+        <label class="switch">
+          <input type="checkbox" id="keep-pitch">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+
+      <!-- 8D Audio Toggle -->
+      <div class="toggle-row">
+        <span class="toggle-label">8D Audio Spatial</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-8d">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+
+      <!-- Karaoke Toggle -->
+      <div class="toggle-row">
+        <span class="toggle-label">Karaoke Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-karaoke">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Presets Grid Section -->
+    <div class="presets-section">
+      <div class="preset-row">
+        <button id="btn-reset" class="preset-btn">Reset</button>
+        <button id="btn-slowed" class="preset-btn">Slowed</button>
+        <button id="btn-nightcore" class="preset-btn">Nightcore</button>
+      </div>
+      <div class="preset-row">
+        <button id="btn-bass-boost" class="preset-btn">Bass Boost</button>
+        <button id="btn-vocal-boost" class="preset-btn">Vocal Boost</button>
+        <button id="btn-8d" class="preset-btn">8D Preset</button>
+      </div>
+    </div>
+
+    <!-- Footer Support Button -->
+    <a href="https://ko-fi.com" target="_blank" class="support-btn">
+      <span class="coffee-icon">☕</span> can we drink together ?
+    </a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+
+</html>
