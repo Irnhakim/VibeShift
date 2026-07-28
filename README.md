@@ -51,8 +51,6 @@ To run this extension locally in developer mode:
 6.  Select the project directory (containing `manifest.json`).
 7.  Open YouTube or Spotify Web, play a song, and click the VibeShift icon to start shifting the vibe!
 
-*(Note: If the extension manager page displays a generic icon, double-click `generate-icons.html` inside the extension directory to generate the required PNGs and place them in the project root).*
-
 ---
 
 ## 📄 License
