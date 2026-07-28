@@ -256,22 +256,39 @@ function startPanningLoop() {
   }, 30);
 }
 
+let hasUserInteracted = false;
+
 // Monitor page for new audio/video tags
 function scanForMediaElements() {
   const mediaElements = Array.from(document.querySelectorAll('video, audio'));
   mediaElements.forEach(element => {
-    hookMediaElement(element);
+    if (hookedElements.has(element)) return;
+
+    const performHook = () => {
+      hookMediaElement(element);
+      element.removeEventListener('play', performHook);
+      element.removeEventListener('playing', performHook);
+    };
+
+    if (!element.paused || hasUserInteracted) {
+      performHook();
+    } else {
+      element.addEventListener('play', performHook);
+      element.addEventListener('playing', performHook);
+    }
   });
 }
 
-// Resume context on user gesture
-function resumeContext() {
+// Resume context and register gesture on user interaction
+function registerUserInteraction() {
+  hasUserInteracted = true;
   if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
+    audioCtx.resume().catch(e => console.log("VibeShift: Context resume failed:", e));
   }
+  scanForMediaElements();
 }
-window.addEventListener('click', resumeContext, { capture: true, passive: true });
-window.addEventListener('keydown', resumeContext, { capture: true, passive: true });
+window.addEventListener('click', registerUserInteraction, { capture: true, passive: true });
+window.addEventListener('keydown', registerUserInteraction, { capture: true, passive: true });
 
 let hasReceivedState = false;
 
@@ -282,10 +299,7 @@ window.addEventListener('message', (event) => {
     audioState = event.data.state;
     console.log("VibeShift: Received audio state update:", audioState);
     
-    // Resume context if needed
-    getAudioContext();
-    
-    // Apply state to all current graphs
+    // Apply state to all current graphs (no getAudioContext call here to prevent Autoplay warning)
     hookedElements.forEach(graph => {
       applyStateToGraph(graph, audioState);
     });
@@ -299,17 +313,23 @@ window.addEventListener('message', (event) => {
 // Run scans periodically
 setInterval(scanForMediaElements, 1000);
 
-// Watch for dynamically added media elements immediately using MutationObserver to hook them first
+// Watch for dynamically added media elements immediately using MutationObserver to register them safely
 const observer = new MutationObserver((mutations) => {
+  let shouldScan = false;
   for (const mutation of mutations) {
     for (const node of mutation.addedNodes) {
       if (node.nodeName === 'VIDEO' || node.nodeName === 'AUDIO') {
-        hookMediaElement(node);
-      } else if (node.querySelectorAll) {
-        const mediaElements = node.querySelectorAll('video, audio');
-        mediaElements.forEach(element => hookMediaElement(element));
+        shouldScan = true;
+        break;
+      } else if (node.querySelectorAll && node.querySelectorAll('video, audio').length > 0) {
+        shouldScan = true;
+        break;
       }
     }
+    if (shouldScan) break;
+  }
+  if (shouldScan) {
+    scanForMediaElements();
   }
 });
 observer.observe(document.documentElement, { childList: true, subtree: true });
