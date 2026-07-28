@@ -1,5 +1,12 @@
-// State storage
-let audioState = {
+(function() {
+  if (window.__VIBESHIFT_CONTENT_INITIALIZED__) {
+    console.log("VibeShift: content.js already initialized in this frame. Bypassing duplicate load.");
+    return;
+  }
+  window.__VIBESHIFT_CONTENT_INITIALIZED__ = true;
+
+  // State storage
+  let audioState = {
   enabled: true,
   speed: 1.0,
   reverb: 0,
@@ -56,8 +63,8 @@ function hookMediaElement(element) {
     const source = ctx.createMediaElementSource(element);
 
     // 1. Channel Splitter and Merger for Karaoke (vocal removal)
-    const splitter = ctx.createSplitter(2);
-    const merger = ctx.createMerger(2);
+    const splitter = ctx.createChannelSplitter(2);
+    const merger = ctx.createChannelMerger(2);
 
     // Karaoke Gain Nodes
     const leftToLeft = ctx.createGain();   // L -> L
@@ -150,7 +157,15 @@ function hookMediaElement(element) {
     hookedElements.set(element, graph);
     applyStateToGraph(graph, audioState);
   } catch (err) {
-    console.warn("VibeShift: Failed to hook media element (possible CORS restriction):", err);
+    if (err.name === 'InvalidStateError') {
+      console.error(
+        "VibeShift Conflict Detected: Another active Chrome extension (e.g. Volume Booster, Equalizer) has already hooked the YouTube video player. " +
+        "Chrome only allows one extension to control a media element's audio graph at a time. " +
+        "Please turn off or disable other audio booster/equalizer extensions to allow VibeShift to work!"
+      );
+    } else {
+      console.warn("VibeShift: Failed to hook media element. Name:", err.name, "Message:", err.message, "Stack:", err.stack);
+    }
   }
 }
 
@@ -258,10 +273,15 @@ function resumeContext() {
 window.addEventListener('click', resumeContext, { capture: true, passive: true });
 window.addEventListener('keydown', resumeContext, { capture: true, passive: true });
 
+let hasReceivedState = false;
+
 // Listen for messages from the bridge script (Isolated -> Main world bridge)
 window.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'VIBESHIFT_BRIDGE_UPDATE') {
+    hasReceivedState = true;
     audioState = event.data.state;
+    console.log("VibeShift: Received audio state update:", audioState);
+    
     // Resume context if needed
     getAudioContext();
     
@@ -279,6 +299,32 @@ window.addEventListener('message', (event) => {
 // Run scans periodically
 setInterval(scanForMediaElements, 1000);
 
-// Initialize: Scan immediately and request latest state from bridge
+// Watch for dynamically added media elements immediately using MutationObserver to hook them first
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (node.nodeName === 'VIDEO' || node.nodeName === 'AUDIO') {
+        hookMediaElement(node);
+      } else if (node.querySelectorAll) {
+        const mediaElements = node.querySelectorAll('video, audio');
+        mediaElements.forEach(element => hookMediaElement(element));
+      }
+    }
+  }
+});
+observer.observe(document.documentElement, { childList: true, subtree: true });
+
+// Initialize: Scan immediately
 scanForMediaElements();
-window.postMessage({ type: 'VIBESHIFT_PULL_STATE' }, '*');
+
+// Poll for initial state until we receive it to prevent race conditions
+const statePollInterval = setInterval(() => {
+  if (hasReceivedState) {
+    clearInterval(statePollInterval);
+    console.log("VibeShift: Successfully synchronized state, stopping poll.");
+  } else {
+    console.log("VibeShift: Pulling state from extension bridge...");
+    window.postMessage({ type: 'VIBESHIFT_PULL_STATE' }, '*');
+  }
+}, 300);
+})();

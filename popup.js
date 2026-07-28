@@ -109,7 +109,7 @@ function getStateFromUI() {
     keepPitch: keepPitchInput.checked,
     spatial8d: spatial8dInput.checked,
     karaoke: karaokeInput.checked,
-    theme: document.body.classList.contains('light-theme') ? 'light' : 'dark'
+    theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light'
   };
 }
 
@@ -227,16 +227,16 @@ presetBtns.spatialPreset.addEventListener('click', () => {
 
 // Theme selection
 themeBtn.addEventListener('click', () => {
-  const isLight = document.body.classList.toggle('light-theme');
-  const theme = isLight ? 'light' : 'dark';
+  const isDark = document.body.classList.toggle('dark-theme');
+  const theme = isDark ? 'dark' : 'light';
   chrome.storage.local.set({ theme });
 });
 
 function applyTheme(theme) {
-  if (theme === 'light') {
-    document.body.classList.add('light-theme');
+  if (theme === 'dark') {
+    document.body.classList.add('dark-theme');
   } else {
-    document.body.classList.remove('light-theme');
+    document.body.classList.remove('dark-theme');
   }
 }
 
