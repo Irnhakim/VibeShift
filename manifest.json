@@ -44,7 +44,7 @@
         "*://*.spotify.com/*",
         "*://*.soundcloud.com/*"
       ],
-      "js": ["content.js"],
+      "js": ["SignalsmithStretch.js", "content.js"],
       "run_at": "document_start",
       "all_frames": true,
       "world": "MAIN"

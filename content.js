@@ -7,16 +7,17 @@
 
   // State storage
   let audioState = {
-  enabled: true,
-  speed: 1.0,
-  reverb: 0,
-  bass: 0,
-  mid: 0,
-  treble: 0,
-  keepPitch: false,
-  spatial8d: false,
-  karaoke: false
-};
+    enabled: true,
+    speed: 1.0,
+    pitch: 0,
+    reverb: 0,
+    bass: 0,
+    mid: 0,
+    treble: 0,
+    keepPitch: false,
+    spatial8d: false,
+    karaoke: false
+  };
 
 // Keep track of initialized media elements and their audio graphs
 const hookedElements = new Map();
@@ -55,12 +56,24 @@ function createReverbImpulseResponse(ctx, duration, decay) {
 }
 
 // Hook a media element
-function hookMediaElement(element) {
+async function hookMediaElement(element) {
   if (hookedElements.has(element)) return;
 
   try {
     const ctx = getAudioContext();
     const source = ctx.createMediaElementSource(element);
+
+    // Initialize SignalsmithStretch node for high-quality pitch shifting
+    let stretchNode = null;
+    try {
+      if (typeof SignalsmithStretch === 'function') {
+        stretchNode = await SignalsmithStretch(ctx);
+        stretchNode.start();
+        console.log("VibeShift: SignalsmithStretch pitch shifter initialized successfully.");
+      }
+    } catch (e) {
+      console.warn("VibeShift: Failed to initialize SignalsmithStretch pitch shifter:", e);
+    }
 
     // 1. Channel Splitter and Merger for Karaoke (vocal removal)
     const splitter = ctx.createChannelSplitter(2);
@@ -72,8 +85,14 @@ function hookMediaElement(element) {
     const rightToLeft = ctx.createGain();  // R -> L (inverted for cancellation)
     const leftToRight = ctx.createGain();  // L -> R (inverted for cancellation)
 
-    // Connect Splitter to Gains
-    source.connect(splitter);
+    // Route source through SignalsmithStretch if available
+    if (stretchNode) {
+      source.connect(stretchNode);
+      stretchNode.connect(splitter);
+    } else {
+      source.connect(splitter);
+    }
+
     splitter.connect(leftToLeft, 0);
     splitter.connect(leftToRight, 0);
     splitter.connect(rightToRight, 1);
@@ -140,6 +159,7 @@ function hookMediaElement(element) {
     const graph = {
       element,
       source,
+      stretchNode,
       leftToLeft,
       rightToRight,
       rightToLeft,
@@ -188,7 +208,7 @@ function hookMediaElement(element) {
 
 // Apply settings to a specific audio graph
 function applyStateToGraph(graph, state) {
-  const { element, leftToLeft, rightToRight, rightToLeft, leftToRight, bassFilter, midFilter, trebleFilter, dryGain, wetGain, panner, effectsGain, bypassGain } = graph;
+  const { element, stretchNode, leftToLeft, rightToRight, rightToLeft, leftToRight, bassFilter, midFilter, trebleFilter, dryGain, wetGain, panner, effectsGain, bypassGain } = graph;
 
   if (state.enabled) {
     effectsGain.gain.value = 1.0;
@@ -197,12 +217,21 @@ function applyStateToGraph(graph, state) {
     // 1. Playback Speed & Pitch
     try {
       element.playbackRate = state.speed;
-      if ('preservesPitch' in element) {
-        element.preservesPitch = state.keepPitch;
-      } else if ('webkitPreservesPitch' in element) {
-        element.webkitPreservesPitch = state.keepPitch;
-      } else if ('mozPreservesPitch' in element) {
-        element.mozPreservesPitch = state.keepPitch;
+      
+      if (stretchNode) {
+        // High-quality DSP Pitch Shifter (SignalsmithStretch)
+        stretchNode.schedule({ semitones: state.pitch });
+        // Force native preservesPitch to true to decouple browser pitch adjustments from speed
+        if ('preservesPitch' in element) element.preservesPitch = true;
+      } else {
+        // Fallback to browser's native preservesPitch
+        if ('preservesPitch' in element) {
+          element.preservesPitch = state.keepPitch;
+        } else if ('webkitPreservesPitch' in element) {
+          element.webkitPreservesPitch = state.keepPitch;
+        } else if ('mozPreservesPitch' in element) {
+          element.mozPreservesPitch = state.keepPitch;
+        }
       }
     } catch (e) {
       console.error("VibeShift: Failed to update speed/pitch on element:", e);
@@ -241,6 +270,10 @@ function applyStateToGraph(graph, state) {
     // Bypassed: route raw audio and reset speed & pitch
     effectsGain.gain.value = 0.0;
     bypassGain.gain.value = 1.0;
+
+    if (stretchNode) {
+      stretchNode.schedule({ semitones: 0 });
+    }
 
     try {
       element.playbackRate = 1.0;

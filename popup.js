@@ -2,6 +2,7 @@
 const defaults = {
   enabled: true,
   speed: 1.0,
+  pitch: 0,
   reverb: 0,
   bass: 0,
   mid: 0,
@@ -14,6 +15,7 @@ const defaults = {
 
 // UI Elements
 const speedInput = document.getElementById('speed');
+const pitchInput = document.getElementById('pitch');
 const reverbInput = document.getElementById('reverb');
 const bassInput = document.getElementById('bass');
 const midInput = document.getElementById('mid');
@@ -23,6 +25,7 @@ const spatial8dInput = document.getElementById('toggle-8d');
 const karaokeInput = document.getElementById('toggle-karaoke');
 
 const speedVal = document.getElementById('speed-val');
+const pitchVal = document.getElementById('pitch-val');
 const reverbVal = document.getElementById('reverb-val');
 const bassVal = document.getElementById('bass-val');
 const midVal = document.getElementById('mid-val');
@@ -51,6 +54,7 @@ chrome.storage.local.get(defaults, (state) => {
 // Update UI elements based on state
 function updateUI(state) {
   speedInput.value = state.speed;
+  pitchInput.value = state.pitch;
   reverbInput.value = state.reverb;
   bassInput.value = state.bass;
   midInput.value = state.mid;
@@ -67,8 +71,8 @@ function updateUI(state) {
   }
 
   // Format values
-  const speedPercentage = Math.round((state.speed - 1) * 100);
-  speedVal.textContent = speedPercentage >= 0 ? `+${speedPercentage}%` : `${speedPercentage}%`;
+  speedVal.textContent = `${state.speed.toFixed(2)}x`;
+  pitchVal.textContent = `${state.pitch >= 0 ? '+' : ''}${state.pitch} st`;
   reverbVal.textContent = `${state.reverb}%`;
   bassVal.textContent = `${state.bass > 0 ? '+' : ''}${state.bass} dB`;
   midVal.textContent = `${state.mid > 0 ? '+' : ''}${state.mid} dB`;
@@ -82,15 +86,15 @@ function updateUI(state) {
 function updatePresetButtonHighlights(state) {
   Object.values(presetBtns).forEach(btn => btn.classList.remove('active'));
 
-  if (state.speed === 1.0 && state.reverb === 0 && state.bass === 0 && state.mid === 0 && state.treble === 0 && !state.spatial8d && !state.karaoke) {
+  if (state.speed === 1.0 && state.pitch === 0 && state.reverb === 0 && state.bass === 0 && state.mid === 0 && state.treble === 0 && !state.spatial8d && !state.karaoke) {
     presetBtns.reset.classList.add('active');
-  } else if (state.speed === 0.8 && state.reverb === 35 && state.bass === 3 && state.mid === 0 && state.treble === -2 && !state.keepPitch) {
+  } else if (state.speed === 0.8 && state.pitch === -2 && state.reverb === 35 && state.bass === 3 && state.mid === 0 && state.treble === -2) {
     presetBtns.slowed.classList.add('active');
-  } else if (state.speed === 1.25 && state.reverb === 0 && state.bass === 0 && state.mid === 0 && state.treble === 0 && !state.keepPitch) {
+  } else if (state.speed === 1.25 && state.pitch === 3 && state.reverb === 0 && state.bass === 0 && state.mid === 0 && state.treble === 0) {
     presetBtns.nightcore.classList.add('active');
-  } else if (state.speed === 1.0 && state.reverb === 0 && state.bass === 10 && state.mid === 0 && state.treble === 0) {
+  } else if (state.speed === 1.0 && state.pitch === 0 && state.reverb === 0 && state.bass === 10 && state.mid === 0 && state.treble === 0) {
     presetBtns.bassBoost.classList.add('active');
-  } else if (state.speed === 1.0 && state.reverb === 0 && state.bass === -3 && state.mid === 8 && state.treble === 2) {
+  } else if (state.speed === 1.0 && state.pitch === 0 && state.reverb === 0 && state.bass === -3 && state.mid === 8 && state.treble === 2) {
     presetBtns.vocalBoost.classList.add('active');
   } else if (state.spatial8d) {
     presetBtns.spatialPreset.classList.add('active');
@@ -102,6 +106,7 @@ function getStateFromUI() {
   return {
     enabled: powerBtn.classList.contains('active'),
     speed: parseFloat(speedInput.value),
+    pitch: parseInt(pitchInput.value),
     reverb: parseInt(reverbInput.value),
     bass: parseInt(bassInput.value),
     mid: parseInt(midInput.value),
@@ -122,7 +127,7 @@ function handleInputChange() {
 }
 
 // Attach Event Listeners to Inputs
-[speedInput, reverbInput, bassInput, midInput, trebleInput].forEach(input => {
+[speedInput, pitchInput, reverbInput, bassInput, midInput, trebleInput].forEach(input => {
   input.addEventListener('input', handleInputChange);
 });
 [keepPitchInput, spatial8dInput, karaokeInput].forEach(toggle => {
@@ -153,11 +158,12 @@ presetBtns.slowed.addEventListener('click', () => {
   const newState = {
     ...state,
     speed: 0.8,
+    pitch: -2,
     reverb: 35,
     bass: 3,
     mid: 0,
     treble: -2,
-    keepPitch: false
+    keepPitch: true
   };
   chrome.storage.local.set(newState);
   updateUI(newState);
@@ -169,11 +175,12 @@ presetBtns.nightcore.addEventListener('click', () => {
   const newState = {
     ...state,
     speed: 1.25,
+    pitch: 3,
     reverb: 0,
     bass: 0,
     mid: 0,
     treble: 0,
-    keepPitch: false
+    keepPitch: true
   };
   chrome.storage.local.set(newState);
   updateUI(newState);
@@ -185,6 +192,7 @@ presetBtns.bassBoost.addEventListener('click', () => {
   const newState = {
     ...state,
     speed: 1.0,
+    pitch: 0,
     reverb: 0,
     bass: 10,
     mid: 0,
@@ -201,6 +209,7 @@ presetBtns.vocalBoost.addEventListener('click', () => {
   const newState = {
     ...state,
     speed: 1.0,
+    pitch: 0,
     reverb: 0,
     bass: -3,
     mid: 8,
@@ -216,9 +225,12 @@ presetBtns.spatialPreset.addEventListener('click', () => {
   const state = getStateFromUI();
   const newState = {
     ...state,
+    speed: 1.0,
+    pitch: 0,
     spatial8d: true,
     reverb: 20,
-    bass: 2
+    bass: 2,
+    keepPitch: true
   };
   chrome.storage.local.set(newState);
   updateUI(newState);

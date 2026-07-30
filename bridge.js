@@ -9,6 +9,7 @@
   const defaultState = {
     enabled: true,
     speed: 1.0,
+    pitch: 0,
     reverb: 0,
     bass: 0,
     mid: 0,
