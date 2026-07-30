@@ -14,7 +14,6 @@
     bass: 0,
     mid: 0,
     treble: 0,
-    keepPitch: false,
     spatial8d: false,
     karaoke: false
   };
@@ -229,17 +228,15 @@ function applyStateToGraph(graph, state) {
       if (stretchNode) {
         // High-quality DSP Pitch Shifter (SignalsmithStretch)
         stretchNode.schedule({ semitones: state.pitch });
-        // Force native preservesPitch to true to decouple browser pitch adjustments from speed
-        if ('preservesPitch' in element) element.preservesPitch = true;
-      } else {
-        // Fallback to browser's native preservesPitch
-        if ('preservesPitch' in element) {
-          element.preservesPitch = state.keepPitch;
-        } else if ('webkitPreservesPitch' in element) {
-          element.webkitPreservesPitch = state.keepPitch;
-        } else if ('mozPreservesPitch' in element) {
-          element.mozPreservesPitch = state.keepPitch;
-        }
+      }
+      
+      // Force native preservesPitch to true to decouple speed and pitch
+      if ('preservesPitch' in element) {
+        element.preservesPitch = true;
+      } else if ('webkitPreservesPitch' in element) {
+        element.webkitPreservesPitch = true;
+      } else if ('mozPreservesPitch' in element) {
+        element.mozPreservesPitch = true;
       }
     } catch (e) {
       console.error("VibeShift: Failed to update speed/pitch on element:", e);

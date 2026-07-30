@@ -14,7 +14,6 @@
     bass: 0,
     mid: 0,
     treble: 0,
-    keepPitch: false,
     spatial8d: false,
     karaoke: false
   };

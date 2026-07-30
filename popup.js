@@ -7,7 +7,6 @@ const defaults = {
   bass: 0,
   mid: 0,
   treble: 0,
-  keepPitch: false,
   spatial8d: false,
   karaoke: false,
   theme: 'dark'
@@ -20,7 +19,6 @@ const reverbInput = document.getElementById('reverb');
 const bassInput = document.getElementById('bass');
 const midInput = document.getElementById('mid');
 const trebleInput = document.getElementById('treble');
-const keepPitchInput = document.getElementById('keep-pitch');
 const spatial8dInput = document.getElementById('toggle-8d');
 const karaokeInput = document.getElementById('toggle-karaoke');
 
@@ -59,7 +57,6 @@ function updateUI(state) {
   bassInput.value = state.bass;
   midInput.value = state.mid;
   trebleInput.value = state.treble;
-  keepPitchInput.checked = state.keepPitch;
   spatial8dInput.checked = state.spatial8d;
   karaokeInput.checked = state.karaoke;
 
@@ -111,7 +108,6 @@ function getStateFromUI() {
     bass: parseInt(bassInput.value),
     mid: parseInt(midInput.value),
     treble: parseInt(trebleInput.value),
-    keepPitch: keepPitchInput.checked,
     spatial8d: spatial8dInput.checked,
     karaoke: karaokeInput.checked,
     theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light'
@@ -130,7 +126,7 @@ function handleInputChange() {
 [speedInput, pitchInput, reverbInput, bassInput, midInput, trebleInput].forEach(input => {
   input.addEventListener('input', handleInputChange);
 });
-[keepPitchInput, spatial8dInput, karaokeInput].forEach(toggle => {
+[spatial8dInput, karaokeInput].forEach(toggle => {
   toggle.addEventListener('change', handleInputChange);
 });
 
@@ -162,8 +158,7 @@ presetBtns.slowed.addEventListener('click', () => {
     reverb: 35,
     bass: 3,
     mid: 0,
-    treble: -2,
-    keepPitch: true
+    treble: -2
   };
   chrome.storage.local.set(newState);
   updateUI(newState);
@@ -179,8 +174,7 @@ presetBtns.nightcore.addEventListener('click', () => {
     reverb: 0,
     bass: 0,
     mid: 0,
-    treble: 0,
-    keepPitch: true
+    treble: 0
   };
   chrome.storage.local.set(newState);
   updateUI(newState);
@@ -196,8 +190,7 @@ presetBtns.bassBoost.addEventListener('click', () => {
     reverb: 0,
     bass: 10,
     mid: 0,
-    treble: 0,
-    keepPitch: true
+    treble: 0
   };
   chrome.storage.local.set(newState);
   updateUI(newState);
@@ -213,8 +206,7 @@ presetBtns.vocalBoost.addEventListener('click', () => {
     reverb: 0,
     bass: -3,
     mid: 8,
-    treble: 2,
-    keepPitch: true
+    treble: 2
   };
   chrome.storage.local.set(newState);
   updateUI(newState);
@@ -229,8 +221,7 @@ presetBtns.spatialPreset.addEventListener('click', () => {
     pitch: 0,
     spatial8d: true,
     reverb: 20,
-    bass: 2,
-    keepPitch: true
+    bass: 2
   };
   chrome.storage.local.set(newState);
   updateUI(newState);
