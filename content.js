@@ -70,8 +70,14 @@ async function hookMediaElement(element) {
           SignalsmithStretch.moduleUrl = extensionWorkletUrl;
         }
         stretchNode = await SignalsmithStretch(ctx);
+        // Configure for ultra-smooth high-fidelity stretching (6x overlap)
+        stretchNode.configure({
+          blockMs: 120,
+          intervalMs: 20,
+          splitComputation: true
+        });
         stretchNode.start();
-        console.log("VibeShift: SignalsmithStretch pitch shifter initialized successfully.");
+        console.log("VibeShift: SignalsmithStretch pitch shifter initialized successfully with high-quality config.");
       }
     } catch (e) {
       console.warn(
