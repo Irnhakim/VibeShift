@@ -231,18 +231,21 @@ function applyStateToGraph(graph, state) {
     try {
       element.playbackRate = state.speed;
       
-      if (stretchNode) {
-        // High-quality DSP Pitch Shifter (SignalsmithStretch)
-        stretchNode.schedule({ semitones: state.pitch });
-      }
-      
-      // Force native preservesPitch to true to decouple speed and pitch
+      // Always disable native preservesPitch to bypass browser's low-quality SOLA time-stretcher
       if ('preservesPitch' in element) {
-        element.preservesPitch = true;
+        element.preservesPitch = false;
       } else if ('webkitPreservesPitch' in element) {
-        element.webkitPreservesPitch = true;
+        element.webkitPreservesPitch = false;
       } else if ('mozPreservesPitch' in element) {
-        element.mozPreservesPitch = true;
+        element.mozPreservesPitch = false;
+      }
+
+      if (stretchNode) {
+        // Calculate natural pitch shift caused by speed change (vinyl effect)
+        const naturalShift = 12 * Math.log2(state.speed);
+        // Compensate to reach the user's target pitch shift exactly
+        const requiredShift = state.pitch - naturalShift;
+        stretchNode.schedule({ semitones: requiredShift });
       }
     } catch (e) {
       console.error("VibeShift: Failed to update speed/pitch on element:", e);
