@@ -67,12 +67,20 @@ async function hookMediaElement(element) {
     let stretchNode = null;
     try {
       if (typeof SignalsmithStretch === 'function') {
+        if (extensionWorkletUrl) {
+          SignalsmithStretch.moduleUrl = extensionWorkletUrl;
+        }
         stretchNode = await SignalsmithStretch(ctx);
         stretchNode.start();
         console.log("VibeShift: SignalsmithStretch pitch shifter initialized successfully.");
       }
     } catch (e) {
-      console.warn("VibeShift: Failed to initialize SignalsmithStretch pitch shifter:", e);
+      console.warn(
+        "VibeShift: Failed to initialize SignalsmithStretch pitch shifter. " +
+        "Name:", e ? e.name : "unknown", 
+        "Message:", e ? e.message : "unknown", 
+        "Stack:", e ? e.stack : "none"
+      );
     }
 
     // 1. Channel Splitter and Merger for Karaoke (vocal removal)
@@ -341,12 +349,16 @@ window.addEventListener('click', registerUserInteraction, { capture: true, passi
 window.addEventListener('keydown', registerUserInteraction, { capture: true, passive: true });
 
 let hasReceivedState = false;
+let extensionWorkletUrl = null;
 
 // Listen for messages from the bridge script (Isolated -> Main world bridge)
 window.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'VIBESHIFT_BRIDGE_UPDATE') {
     hasReceivedState = true;
     audioState = event.data.state;
+    if (event.data.workletUrl) {
+      extensionWorkletUrl = event.data.workletUrl;
+    }
     console.log("VibeShift: Received audio state update:", audioState);
     
     // Apply state to all current graphs (no getAudioContext call here to prevent Autoplay warning)

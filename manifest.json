@@ -49,5 +49,15 @@
       "all_frames": true,
       "world": "MAIN"
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["SignalsmithStretchWorklet.js"],
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.spotify.com/*",
+        "*://*.soundcloud.com/*"
+      ]
+    }
   ]
 }

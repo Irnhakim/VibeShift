@@ -23,7 +23,8 @@
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'VIBESHIFT_UPDATE') {
       console.log("VibeShift Bridge: Forwarding update to Main World", message.state);
-      window.postMessage({ type: 'VIBESHIFT_BRIDGE_UPDATE', state: message.state }, '*');
+      const workletUrl = chrome.runtime.getURL('SignalsmithStretchWorklet.js');
+      window.postMessage({ type: 'VIBESHIFT_BRIDGE_UPDATE', state: message.state, workletUrl }, '*');
     }
   });
 
@@ -31,7 +32,8 @@
   chrome.storage.local.get(defaultState, (storedState) => {
     console.log("VibeShift Bridge: Loaded initial state", storedState);
     setTimeout(() => {
-      window.postMessage({ type: 'VIBESHIFT_BRIDGE_UPDATE', state: storedState }, '*');
+      const workletUrl = chrome.runtime.getURL('SignalsmithStretchWorklet.js');
+      window.postMessage({ type: 'VIBESHIFT_BRIDGE_UPDATE', state: storedState, workletUrl }, '*');
     }, 100);
   });
 
@@ -40,7 +42,8 @@
     if (event.data && event.data.type === 'VIBESHIFT_PULL_STATE') {
       console.log("VibeShift Bridge: Received pull request from Main World");
       chrome.storage.local.get(defaultState, (storedState) => {
-        window.postMessage({ type: 'VIBESHIFT_BRIDGE_UPDATE', state: storedState }, '*');
+        const workletUrl = chrome.runtime.getURL('SignalsmithStretchWorklet.js');
+        window.postMessage({ type: 'VIBESHIFT_BRIDGE_UPDATE', state: storedState, workletUrl }, '*');
       });
     }
   });
